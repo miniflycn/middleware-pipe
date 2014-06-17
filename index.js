@@ -6,8 +6,10 @@ var map = require('map-stream')
   , fs = require('fs')
   , p = require('path');
 
-function factory(path) {
+function factory(path, reg, fix) {
   var _path = path
+    , _reg = reg
+    , _fix = fix
     , _streams = [];
 
   function pipe(streamFactory) {
@@ -30,13 +32,13 @@ function factory(path) {
     });
   }
 
-  function run(path, fn) {
+  function run(path, req, fn) {
     var s = stream(path)
       , streamList = []
       , streams
 
     _streams.forEach(function (foo) {
-      streamList.push(foo());
+      streamList.push(foo(req));
     });
 
     streams = multipipe.apply(null, streamList);
@@ -55,12 +57,13 @@ function factory(path) {
   }
 
   function cp(req, res, next) {
-    var path = p.join(_path, req.url);
+    if (_reg && !_reg.test(req.url)) return next();
+    var path = p.join(_path, _fix ? _fix(req.url) : req.url);
     fs.exists(path, function (exists) {
       if (!exists) return next();
-      run(path, function (err, data) {
+      run(path, req, function (err, data) {
         if (err) return next(err);
-        res.writeHead(200, { 'Content-Type': mime.contentType(mime.lookup(path)) });
+        res.writeHead(200, { 'Content-Type': mime.contentType(mime.lookup(req.url)) });
         res.statusCode = 200;
         res.end(data);
       });
