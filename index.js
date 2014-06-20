@@ -6,11 +6,26 @@ var map = require('map-stream')
   , fs = require('fs')
   , p = require('path');
 
+/**
+ * factory(path, reg)
+ * factory(path, fix)
+ * factory(path, reg, fix)
+ * Create a connect-pipe-middleware
+ * @param {String} cwd All `src` matches are relative to this path 
+ * @param {RegExp} reg Request url must match this RegExp
+ * @param {Function} fix The function will fix the url
+ * @returns {Function} middleware A connect middleware
+ */
 function factory(path, reg, fix) {
   var _path = path
     , _reg = reg
     , _fix = fix
     , _streams = [];
+
+  if (!_fix && typeof _reg === 'function') {
+    _fix = _reg;
+    _reg = null;
+  }
 
   function pipe(streamFactory) {
     _streams.push(streamFactory);
@@ -56,6 +71,7 @@ function factory(path, reg, fix) {
             .pipe(map(done));
   }
 
+  // cp(connect-pipe-middleware)
   function cp(req, res, next) {
     if (_reg && !_reg.test(req.url)) return next();
     var path = p.join(_path, _fix ? _fix(req.url) : req.url);
@@ -70,6 +86,11 @@ function factory(path, reg, fix) {
     });
   }
 
+  /**
+   * pipe
+   * Actually it just push the stream factory to the stream factory list
+   * @param {Function} streamFactory
+   */
   cp.pipe = pipe;
 
   return cp;
