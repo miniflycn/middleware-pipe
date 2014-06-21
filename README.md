@@ -6,7 +6,7 @@ Use gulp plugins in connect heavily inspired by file-pipe
 Setup
 -----
 
-	$ npm install middleware-pipe
+    $ npm install middleware-pipe
 
 Useage
 ------
@@ -17,13 +17,45 @@ var connect = require('connect')
   , insert = require('gulp-insert');
 
 var app = connect()
-			// use middleware-pipe
-            .use(pipeMiddle('./src').pipe(function () {
-            	// insert 'hello world!' to every response body
-            	return insert.append('hello world!');
-            }))
+            // use middleware-pipe
+            .use(pipeMiddle('./src')
+                // it can get the request
+                .pipe(function (req) {
+                    // insert 'hello world!' to every response body
+                    return insert.append('hello world!');
+                }))
             .listen(3000);
 ```
+
+API
+---
+
+```
+/**
+ * middleware(path, reg)
+ * middleware(path, fix)
+ * middleware(path, reg, fix)
+ * Create a connect-pipe-middleware
+ * @param {String} cwd All `src` matches are relative to this path 
+ * @param {RegExp} reg Request url must match this RegExp
+ * @param {Function} fix The function will fix the url
+ * @returns {Function} middleware A connect middleware
+ */
+// match html file
+middleware('./src', /\.html$/)
+
+// match css file, and find the source of less
+middleware('./src', /\.css$/, function (url) {
+    return url.replace(/.css$/, '.less');
+})
+
+```
+
+Sample
+-------
+
+https://github.com/miniflycn/middleware-pipe-sample
+
 
 License
 -------

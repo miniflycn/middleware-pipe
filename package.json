@@ -1,12 +1,12 @@
 {
   "name": "middleware-pipe",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Use gulp plugins in connect",
   "keywords": [
     "badjs",
     "log"
   ],
-  "repository": "git://github.com/minifycn/middleware-pipe.git",
+  "repository": "git://github.com/miniflycn/middleware-pipe.git",
   "author": "Daniel Yang <miniflycn@gmail.com>",
   "main": "index",
   "engines": {
