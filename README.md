@@ -30,7 +30,7 @@ var app = connect()
 API
 ---
 
-```
+```javascript
 /**
  * middleware(path, reg)
  * middleware(path, fix)
