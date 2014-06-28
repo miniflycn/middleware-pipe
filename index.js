@@ -50,7 +50,7 @@ function factory(path, reg, fix) {
   function run(path, req, fn) {
     var s = stream(path)
       , streamList = []
-      , streams
+      , streams;
 
     _streams.forEach(function (foo) {
       streamList.push(foo(req));
