@@ -33,9 +33,13 @@ function factory(path, reg, fix) {
   }
 
   function stream(path) {
-    return fs.createReadStream(path, 'utf8')
-      .pipe(stripbom.stream())
-      .pipe(format(path));
+    var stream = 
+      stripbom.stream()
+        .pipe(format(path));
+    fs.readFile(path, function (err, buffer) {
+      stream.write(buffer);
+    });
+    return stream;
   }
 
   function format(path) {
