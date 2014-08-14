@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/miniflycn/middleware-pipe.svg?branch=master)](https://travis-ci.org/miniflycn/middleware-pipe)
 middleware-pipe
 ===============
 
