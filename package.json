@@ -23,7 +23,8 @@
     "gulp-insert": "*",
     "connect": "*",
     "url-valid": "*",
-    "should": "*"
+    "should": "*",
+    "mocha": "*"
   },
   "scripts": {
     "test": "mocha"
