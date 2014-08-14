@@ -21,7 +21,12 @@
   },
   "devDependencies": {
     "gulp-insert": "*",
-    "connect": "*"
+    "connect": "*",
+    "url-valid": "*",
+    "should": "*"
+  },
+  "scripts": {
+    "test": "mocha"
   },
   "license": "MIT"
 }
