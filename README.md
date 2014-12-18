@@ -19,12 +19,11 @@ var connect = require('connect')
 
 var app = connect()
             // use middleware-pipe
-            .use(pipeMiddle('./src')
+            .use(
+                pipeMiddle('./src')
                 // it can get the request
-                .pipe(function (req) {
-                    // insert 'hello world!' to every response body
-                    return insert.append('hello world!');
-                }))
+                    .pipe(return insert.append('hello world!'))
+            )
             .listen(3000);
 ```
 

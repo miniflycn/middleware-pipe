@@ -4,84 +4,67 @@ var map = require('map-stream')
   , multipipe = require('multipipe')
   , mime = require('mime-types')
   , fs = require('fs')
-  , p = require('path');
+  , path = require('path');
 
 /**
- * factory(path, reg)
- * factory(path, fix)
- * factory(path, reg, fix)
+ * factory(cwd, reg)
+ * factory(cwd, fix)
+ * factory(cwd, reg, fix)
  * Create a connect-pipe-middleware
  * @param {String} cwd All `src` matches are relative to this path 
  * @param {RegExp} reg Request url must match this RegExp
  * @param {Function} fix The function will fix the url
  * @returns {Function} middleware A connect middleware
  */
-function factory(path, reg, fix) {
-  var _path = path
-    , _reg = reg
-    , _fix = fix
-    , _streams = [];
 
-  if (!_fix && typeof _reg === 'function') {
-    _fix = _reg;
-    _reg = null;
+function factory(cwd, reg, fix) {
+  var streams
+    , streamList = []
+    , uid = 0
+    , callbacks = {};
+  
+  // factory(cwd, fix)
+  if (!fix && typeof reg === 'function') {
+    fix = reg;
+    reg = null;
   }
 
-  function pipe(streamFactory) {
-    _streams.push(streamFactory);
+  function pipe(stream) {
+    streamList.push(stream);
     return this;
   }
 
-  function stream(path) {
+  function stream(local, fn) {
+    callbacks[++uid + ''] = fn;
+
     var stream = 
       stripbom.stream()
-        .pipe(format(path));
-    fs.readFile(path, function (err, buffer) {
+        .pipe(format(local, uid));
+    fs.readFile(local, function (err, buffer) {
       stream.write(buffer);
     });
+
     return stream;
   }
 
-  function format(path) {
-    var file = new File({ path: path });
+  function format(local, uid) {
+    var file = new File({ path: local });
+
+    file.uid = uid;
 
     return map(function (buf, fn) {
       file.contents = buf;
-      fn(null, file);
+      streams.write(file);
     });
-  }
-
-  function run(path, req, fn) {
-    var s = stream(path)
-      , streamList = []
-      , streams;
-
-    _streams.forEach(function (foo) {
-      streamList.push(foo(req));
-    });
-
-    streams = multipipe.apply(null, streamList);
-
-    streams.on('error', function (err) {
-      fn && fn(err);
-    });
-
-    function done(file, end) {
-      fn && fn(null, file.contents.toString());
-      end();
-    }
-
-    return s.pipe(streams)
-            .pipe(map(done));
   }
 
   // cp(connect-pipe-middleware)
   function cp(req, res, next) {
-    if (_reg && !_reg.test(req.url)) return next();
-    var path = p.join(_path, _fix ? _fix(req.url) : req.url);
-    fs.exists(path, function (exists) {
+    if (reg && !reg.test(req.url)) return next();
+    var local = path.join(cwd, fix ? fix(req.url) : req.url);
+    fs.exists(local, function (exists) {
       if (!exists) return next();
-      run(path, req, function (err, data) {
+      stream(local, function (err, data) {
         if (err) return next(err);
         res.writeHead(200, { 'Content-Type': mime.contentType(mime.lookup(req.url)) });
         res.statusCode = 200;
@@ -96,6 +79,19 @@ function factory(path, reg, fix) {
    * @param {Function} streamFactory
    */
   cp.pipe = pipe;
+
+  process.nextTick(function () {
+    streamList.push(map(function (file) {
+      var uids = file.uid + ''
+        , fn = callbacks[uids]
+      if (fn) {
+        fn(null, file.contents.toString());
+        callbacks[uids] = null;
+        delete callbacks[uids];
+      }
+    }));
+    streams = multipipe.apply(null, streamList);
+  });
 
   return cp;
 }

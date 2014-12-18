@@ -1,6 +1,6 @@
 {
   "name": "middleware-pipe",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "Use gulp plugins in connect",
   "keywords": [
     "badjs",
@@ -20,11 +20,11 @@
     "mime-types": "*"
   },
   "devDependencies": {
-    "gulp-insert": "*",
     "connect": "*",
-    "url-valid": "*",
+    "gulp-insert": "*",
+    "mocha": "*",
     "should": "*",
-    "mocha": "*"
+    "url-valid": "^0.3.0"
   },
   "scripts": {
     "test": "mocha"

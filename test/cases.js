@@ -8,20 +8,14 @@ var middlePipe = require('../')
 connect()
   .use('/html',
     middlePipe(path.join(__dirname, 'src'))
-      .pipe(function (req) {
-        return insert.prepend('hello ');
-      })
+      .pipe(insert.prepend('hello '))
   ).use('/js',
     middlePipe(path.join(__dirname, 'src'), /\.js$/)
-      .pipe(function (req) {
-        return insert.prepend('hello ');
-      })
+      .pipe(insert.prepend('hello '))
   ).use('/tpl',
     middlePipe(path.join(__dirname, 'src'), function (url) {
       return url.replace(/\.tpl$/, '.html');
-    }).pipe(function (req) {
-      return insert.prepend('hello ');
-    })
+    }).pipe(insert.prepend('hello '))
   ).listen(3000);
 
 describe('middleware-pipe', function () {
@@ -47,5 +41,5 @@ describe('middleware-pipe', function () {
         data.toString().should.equal('hello world!');
         done();
       });
-  })
+  });
 });
