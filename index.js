@@ -83,14 +83,17 @@ function factory(cwd, reg, fix) {
   process.nextTick(function () {
     streamList.push(map(function (file) {
       var uids = file.uid + ''
-        , fn = callbacks[uids]
+        , fn = callbacks[uids];
       if (fn) {
         fn(null, file.contents.toString());
         callbacks[uids] = null;
         delete callbacks[uids];
       }
     }));
-    streams = multipipe.apply(null, streamList);
+    streams = streamList[0];
+    for (var i = 1, l = streamList.length; i < l; i++) {
+      streams.pipe(streamList[i]);
+    }
   });
 
   return cp;
