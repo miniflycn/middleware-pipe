@@ -22,7 +22,7 @@ var app = connect()
             .use(
                 pipeMiddle('./src')
                 // it can get the request
-                    .pipe(return insert.append('hello world!'))
+                    .pipe(insert.append('hello world!'))
             )
             .listen(3000);
 ```
@@ -45,9 +45,7 @@ API
 middleware('./src', /\.html$/)
 
 // match css file, and find the source of less
-middleware('./src', /\.css$/, function (url) {
-    return url.replace(/.css$/, '.less');
-})
+middleware('./src', /\.css$/, url.replace(/.css$/, '.less'))
 
 ```
 

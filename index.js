@@ -80,7 +80,7 @@ function factory(cwd, reg, fix) {
    */
   cp.pipe = pipe;
 
-  process.nextTick(function () {
+  setImmediate(function () {
     streamList.push(map(function (file) {
       var uids = file.uid + ''
         , fn = callbacks[uids];
