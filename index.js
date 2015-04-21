@@ -85,7 +85,7 @@ function factory(cwd, reg, fix) {
       var uids = file.uid + ''
         , fn = callbacks[uids];
       if (fn) {
-        fn(null, file.contents.toString());
+        fn(null, file.contents);
         callbacks[uids] = null;
         delete callbacks[uids];
       }
