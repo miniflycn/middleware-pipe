@@ -20,7 +20,7 @@ connect()
 
 describe('middleware-pipe', function () {
   it('should able to return hello world!', function (done) {
-    valid('http://localhost:3000/html/index.html')
+    valid('http://localhost:3000/html/index.html?key=value')
       .on('data', function (err, data) {
         data.toString().should.equal('hello world!');
         done();

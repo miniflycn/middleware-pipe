@@ -61,7 +61,8 @@ function factory(cwd, reg, fix) {
   // cp(connect-pipe-middleware)
   function cp(req, res, next) {
     if (reg && !reg.test(req.url)) return next();
-    var local = path.join(cwd, fix ? fix(req.url) : req.url);
+    var local = path.join(cwd, fix ? fix(req.url) : req.url)
+                    .replace(/\?(.+)/, '');
     fs.exists(local, function (exists) {
       if (!exists) return next();
       stream(local, function (err, data) {
