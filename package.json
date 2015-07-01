@@ -1,6 +1,6 @@
 {
   "name": "middleware-pipe",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Use gulp plugins in connect",
   "keywords": [
     "badjs",
@@ -13,11 +13,11 @@
     "node": ">= 0.8.0"
   },
   "dependencies": {
-    "map-stream": "*",
-    "strip-bom": "*",
-    "vinyl": "*",
-    "multipipe": "*",
-    "mime-types": "*"
+    "map-stream": "^0.1.0",
+    "strip-bom": "^2.0.0",
+    "vinyl": "^0.5.0",
+    "multipipe": "^0.1.2",
+    "mime-types": "^2.1.2"
   },
   "devDependencies": {
     "connect": "*",

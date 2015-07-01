@@ -37,11 +37,9 @@ function factory(cwd, reg, fix) {
   function stream(local, fn) {
     callbacks[++uid + ''] = fn;
 
-    var stream = 
-      stripbom.stream()
-        .pipe(format(local, uid));
+    var stream = format(local, uid);
     fs.readFile(local, function (err, buffer) {
-      stream.write(buffer);
+      stream.write(stripbom(buffer));
     });
 
     return stream;
