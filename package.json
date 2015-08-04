@@ -1,10 +1,6 @@
 {
   "name": "middleware-pipe",
-<<<<<<< HEAD
   "version": "1.0.7",
-=======
-  "version": "1.0.6",
->>>>>>> origin/master
   "description": "Use gulp plugins in connect",
   "keywords": [
     "badjs",
