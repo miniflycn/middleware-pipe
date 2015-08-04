@@ -11,7 +11,7 @@ var map = require('map-stream')
  * factory(cwd, fix)
  * factory(cwd, reg, fix)
  * Create a connect-pipe-middleware
- * @param {String} cwd All `src` matches are relative to this path 
+ * @param {String} cwd All `src` matches are relative to this path
  * @param {RegExp} reg Request url must match this RegExp
  * @param {Function} fix The function will fix the url
  * @returns {Function} middleware A connect middleware
@@ -22,7 +22,7 @@ function factory(cwd, reg, fix) {
     , streamList = []
     , uid = 0
     , callbacks = {};
-  
+
   // factory(cwd, fix)
   if (!fix && typeof reg === 'function') {
     fix = reg;
@@ -34,10 +34,10 @@ function factory(cwd, reg, fix) {
     return this;
   }
 
-  function stream(local, fn) {
+  function stream(local, fn, options) {
     callbacks[++uid + ''] = fn;
 
-    var stream = format(local, uid);
+    var stream = format(local, uid, options);
     fs.readFile(local, function (err, buffer) {
       stream.write(stripbom(buffer));
     });
@@ -45,10 +45,11 @@ function factory(cwd, reg, fix) {
     return stream;
   }
 
-  function format(local, uid) {
+  function format(local, uid, options) {
     var file = new File({ path: local });
 
     file.uid = uid;
+    if (options.query) file.query = options.query;
 
     return map(function (buf, fn) {
       file.contents = buf;
@@ -60,7 +61,13 @@ function factory(cwd, reg, fix) {
   function cp(req, res, next) {
     if (reg && !reg.test(req.url)) return next();
     var local = path.join(cwd, fix ? fix(req.url) : req.url)
-                    .replace(/\?(.+)/, '');
+      , query;
+
+    local = local.replace(/\?([\s\S]*)$/, function (match) {
+      query = match;
+      return '';
+    });
+
     fs.exists(local, function (exists) {
       if (!exists) return next();
       stream(local, function (err, data) {
@@ -68,7 +75,7 @@ function factory(cwd, reg, fix) {
         res.writeHead(200, { 'Content-Type': mime.contentType(mime.lookup(req.url)) });
         res.statusCode = 200;
         res.end(data);
-      });
+      }, { query: query });
     });
   }
 
